@@ -9,17 +9,18 @@ export default function Home() {
   const [input2, setInput2] = useState("");
   const [input3, setInput3] = useState("");
   const [input4, setInput4] = useState("");
+  const [input5 ,setInput5] = useState("");
   const [textarea, setTextarea] = useState("");
 
   const handleSubmit = async () => {
    
-    if(!input1 || !input2 || !input3 || !input4 || !textarea){
+    if(!input1 || !input2 || !input3 || !input4 || !input5 || !textarea){
       alert("All fields are required!");
       return;
     }
 
     const data = {
-      input1, input2, input3, input4, textarea, time: new Date().toISOString()
+      input1, input2, input3, input4,input5, textarea, time: new Date().toISOString()
     };
 
     try {
@@ -33,7 +34,7 @@ export default function Home() {
       alert(result.message);
 
    
-      setInput1(""); setInput2(""); setInput3(""); setInput4(""); setTextarea("");
+      setInput1(""); setInput2(""); setInput3(""); setInput4("");setInput5(""); setTextarea("");
 
     } catch(err){
       console.error(err);
@@ -109,7 +110,7 @@ export default function Home() {
 
 
 
-       <h2 className="text-4xl font-bold text-black mb-6 text-center mt-10">
+       <h2 className="text-4xl font-bold text-black mb-6 text-center mt-20">
   Nima uchun bizni tanlashadi?
 </h2>
 <p className="text-gray-700 text-center mb-12">
@@ -129,6 +130,17 @@ export default function Home() {
     <h3 className="text-5xl font-bold text-yellow-500">99%</h3>
     <p className="text-gray-300 mt-2">Mijozlar qoniqishi</p>
   </div>
+  
+</div>
+
+
+<div className="text">
+    <p className="text-center text-xl">Siz ham hoziroq IT yechimlarimizdan foydalaning va ishlaringizni osonlashtiring!</p>
+  <br />
+  <p className="text-center text-lg">Hoziroq bizga ariza qoldiring!</p>
+</div>
+<div className="flex justify-center items-center mt-20 mb-20">
+<a href="#ariza"><button className="flex justify-center items-center bg-blue-600 hover:bg-blue-500 px-6 py-3 rounded-full shadow-lg transition-all duration-300 text-white">Ariza qoldirish!</button></a>
 </div>
 
 
@@ -153,9 +165,7 @@ export default function Home() {
 
 
 
-
-
- <section className="py-32 bg-gray-900">
+ <section className="py-32 bg-gray-900" id="ariza">
       <div className="max-w-2xl mx-auto px-4 text-center">
         <h2 className="text-4xl text-white font-bold mb-8">Xizmatlar uchun ariza qoldirish!</h2>
         <form className="space-y-6" >
@@ -163,6 +173,7 @@ export default function Home() {
           <input type="text" placeholder="Familyangiz" className="w-full p-3 rounded-lg bg-gray-800/80 text-white border border-gray-700" value={input2} onChange={e =>{setInput2(e.target.value)}}/>
           <input type="email" placeholder="Email" className="w-full p-3 rounded-lg bg-gray-800/80 text-white border border-gray-700"  value={input3} onChange={e=>setInput3(e.target.value)}/>
           <input type="text" placeholder="Kompaniyangiz nomi...."  className="w-full p-3 rounded-lg bg-gray-800/80 text-white border border-gray-700" value={input4} onChange={e=>setInput4(e.target.value)}/>
+          <input type="text" placeholder="Telefon raqamingizni qoldiring..."  className="w-full p-3 rounded-lg bg-gray-800/80 text-white border border-gray-700" value={input5} onChange={e=>setInput5(e.target.value)}/>
           <textarea placeholder="Xabar yuborish..." className="w-full p-3 rounded-lg bg-gray-800/80 text-white border border-gray-700" value={textarea} onChange={e=>setTextarea(e.target.value)}></textarea>
           <a href="#Main"><button type="submit" className="px-8 py-3 bg-white text-black rounded-full hover:bg-gray-200 transition" onClick={handleSubmit}>Send Message</button></a>
         </form>
