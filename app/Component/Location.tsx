@@ -7,46 +7,46 @@ export default function Location() {
 
      
       <div className="flex flex-col md:flex-row gap-6 justify-evenly items-center mt-10 px-4">
-        <img
-          src="https://i.ibb.co/RGgMB1St/381738538.jpg"
-          alt="Image 1"
-          className="w-64 h-64 object-cover rounded-xl shadow-2xl"
-        />
+        <div className="card shadow-xl p-5 rounded-lg transition-transform duration-300 hover:-translate-y-2">
+          <img src="https://i.ibb.co/RGgMB1St/381738538.jpg"alt="" className="w-64 h-64 object-cover rounded-xl shadow-2xl border-[1px]"/>
+          <p className="text-xl mt-4 text-center font-serif">Hotel Inspera-S Tashkent</p>
+        </div>
       
-        <img
-          src="https://i.ibb.co/0kRNWsd/download.png"
-          alt="Image 2"
-          className="w-64 h-64 object-contain rounded-xl shadow-md"
-        />
+        <div className="card shadow-xl p-5 rounded-lg transition-transform duration-300 hover:-translate-y-2">
+          <img src="https://i.ibb.co/0kRNWsd/download.png" alt="" className="w-64 h-64 object-contain rounded-xl shadow-md border-[1px]"/>
+          <p className="text-xl mt-4 text-center font-serif">Cambridge Learning Center</p>
+        </div>
       </div>
 
      
       <div className="flex flex-col md:flex-row gap-6 justify-evenly items-center mt-10 px-4">
-        <img
-          src="https://i.ibb.co/7xHGHcNJ/logo.png"
-          alt="Image 3"
-          className="w-64 h-64 object-contain rounded-xl shadow-md"
-        />
-        <img
-          src="https://i.ibb.co/jPjg8HDx/5922378.jpg"
-          alt="Image 4"
-          className="w-64 h-64 object-cover rounded-xl shadow-md"
-        />
+       <div className="card shadow-xl p-5 rounded-lg transition-transform duration-300 hover:-translate-y-2">
+        <img src="https://i.ibb.co/7xHGHcNJ/logo.png" alt="" className="w-64 h-64 object-contain rounded-xl shadow-md border-[1px] p-2"/>
+        <p className="text-xl mt-4 text-center font-serif">Colba ta'lim markazi</p>
+       </div>
+       
+
+
+       <div className="card shadow-xl p-5 rounded-lg transition-transform duration-300 hover:-translate-y-2">
+         <img src="https://i.ibb.co/jPjg8HDx/5922378.jpg" alt=""className="w-64 h-64 object-cover rounded-xl shadow-md border-[1px]"/>
+         <p className="text-xl mt-4 text-center font-serif">Mars IT school</p>
+       </div>
       </div>
 
 
 
         <div className="flex flex-col md:flex-row gap-6 justify-evenly items-center mt-10 px-4">
-        <img
-          src="https://i.ibb.co/xt5ZBQ3Q/download.png"
-          alt="Image 3"
-          className="w-64 h-64 object-contain rounded-xl shadow-md"
-        />
-        <img
-          src="https://i.ibb.co/vyp8yk5/download.jpg"
-          alt="Image 4"
-          className="w-64 h-64 object-cover rounded-xl shadow-md"
-        />
+        <div className="card shadow-xl p-5 rounded-lg transition-transform duration-300 hover:-translate-y-2">
+          <img src="https://i.ibb.co/xt5ZBQ3Q/download.png" alt="" className="w-64 h-64 object-contain rounded-xl shadow-md border-[1px]"/>
+          <p className="text-xl mt-4 text-center font-serif">DataLab company</p>
+        </div>
+
+
+
+        <div className="card shadow-xl p-5 rounded-lg transition-transform duration-300 hover:-translate-y-2">
+          <img src="https://i.ibb.co/vyp8yk5/download.jpg" alt=""className="w-64 h-64 object-cover rounded-xl shadow-md border-[1px]"/>
+          <p className="text-xl mt-4 text-center font-serif">Gigu Fashion School</p>
+        </div>
       </div>
     </>
   );
