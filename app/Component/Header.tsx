@@ -15,7 +15,7 @@ export default function Header(){
             <li><Link href="#" className="nav-link text-white text-lg relative after:absolute after:left-0 after:-bottom-1 after:w-0 after:h-0.5 after:bg-white after:transition-all after:duration-300 hover:after:w-full">Bosh sahifa</Link></li>
             <li><a href="#" className="nav-link text-white text-lg relative after:absolute after:left-0 after:-bottom-1 after:w-0 after:h-0.5 after:bg-white after:transition-all after:duration-300 hover:after:w-full">Biz haqimizda</a></li>
             <li><a href="#cards" className="nav-link text-white text-lg relative after:absolute after:left-0 after:-bottom-1 after:w-0 after:h-0.5 after:bg-white after:transition-all after:duration-300 hover:after:w-full">Servislarimiz</a></li>
-            <li><a href="#manzil" className="nav-link text-white text-lg relative after:absolute after:left-0 after:-bottom-1 after:w-0 after:h-0.5 after:bg-white after:transition-all after:duration-300 hover:after:w-full">Manzil</a></li>
+            <li><a href="#manzil" className="nav-link text-white text-lg relative after:absolute after:left-0 after:-bottom-1 after:w-0 after:h-0.5 after:bg-white after:transition-all after:duration-300 hover:after:w-full">Biz bilan ishlashadi</a></li>
             <li><Link href="/Consultation" className="nav-link text-white text-lg relative after:absolute after:left-0 after:-bottom-1 after:w-0 after:h-0.5 after:bg-white after:transition-all after:duration-300 hover:after:w-full">Bepul Consultatsiya olish</Link></li>
           </ul>
 
@@ -40,7 +40,7 @@ export default function Header(){
           <li><Link href="#" className="nav-link text-white text-lg relative after:absolute after:left-0 after:-bottom-1 after:w-0 after:h-0.5 after:bg-white after:transition-all after:duration-300 hover:after:w-full">Bosh sahifa</Link></li>
             <li><a href="#" className="nav-link text-white text-lg relative after:absolute after:left-0 after:-bottom-1 after:w-0 after:h-0.5 after:bg-white after:transition-all after:duration-300 hover:after:w-full">Biz haqimizda</a></li>
             <li><a href="#cards" className="nav-link text-white text-lg relative after:absolute after:left-0 after:-bottom-1 after:w-0 after:h-0.5 after:bg-white after:transition-all after:duration-300 hover:after:w-full">Servislarimiz</a></li>
-            <li><a href="#manzil" className="nav-link text-white text-lg relative after:absolute after:left-0 after:-bottom-1 after:w-0 after:h-0.5 after:bg-white after:transition-all after:duration-300 hover:after:w-full">Manzil</a></li>
+            <li><a href="#manzil" className="nav-link text-white text-lg relative after:absolute after:left-0 after:-bottom-1 after:w-0 after:h-0.5 after:bg-white after:transition-all after:duration-300 hover:after:w-full">Biz bilan ishlashadi</a></li>
             <li><Link href="/Consultation" className="nav-link text-white text-lg relative after:absolute after:left-0 after:-bottom-1 after:w-0 after:h-0.5 after:bg-white after:transition-all after:duration-300 hover:after:w-full">Bepul Consultatsiya olish</Link></li>
         </ul>
       </header>

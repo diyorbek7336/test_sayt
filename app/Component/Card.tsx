@@ -63,7 +63,7 @@ export default function Users() {
   return (
     <>
     
-      <section className="bg-gray-900 min-h-screen p-8">
+      <section className="bg-gray-900 min-h-screen p-8 mt-55">
         <div className="max-w-7xl mx-auto">
           <h1 className="text-4xl sm:text-5xl font-bold text-white mb-12 text-center">
             Bizning xizmatlar

@@ -4,6 +4,7 @@ import Header from "./Component/Header";
 import Card from "../app/Component/Card"
 import Location from "./Component/Location";
 import Ariza from "../app/Component/Ariza"
+import Bagroundvideo from "./Component/Bagroundvideo";
 import Link from "next/link";
 
 export default function Home() {
@@ -14,22 +15,15 @@ export default function Home() {
    
   <Header/>
 <main
-      className="relative bg-gray-900 text-white py-32 flex items-center justify-center"
-      style={{ 
-        backgroundImage: `url(https://static.vecteezy.com/system/resources/thumbnails/002/883/759/small/illustration-of-world-and-network-photo.jpg)`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center'
-      }}
-    >
-      <div className="absolute inset-0 bg-black/50"></div>
+      className="relative bg-gray-900 text-white py-32 flex items-center justify-center">
       <div className="relative z-10 text-center">
         <h1 className="text-5xl sm:text-6xl font-bold mb-4 font-mono">Professional IT yechimlar bizda!</h1>
         <p className="text-lg text-gray-200 mb-8 font-mono">Web development, network security, automation, CCTV services.</p>
        <Link href="/Consultation"><button className="bg-blue-600 hover:bg-blue-500 px-6 py-3 rounded-full shadow-lg transition-all duration-300">Bepul konsultatsiya</button></Link>
       </div>
     </main>
-
-
+     
+<Bagroundvideo/>
 
      <div id="cards"> <Card/></div>
      <div id="manzil"><Location/></div>
