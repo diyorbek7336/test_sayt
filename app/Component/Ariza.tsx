@@ -22,14 +22,6 @@ export default function Ariza() {
       return
     }
 
-    const formId = process.env.NEXT_PUBLIC_FORMSPREE_ID
-    if (!formId) {
-      alert(
-        "Formspree sozlanmagan. Loyiha ildizida .env.local yarating va qo'shing:\nNEXT_PUBLIC_FORMSPREE_ID=your_form_id\n\nformspree.io saytida bepul form yarating va ID ni oling."
-      )
-      return
-    }
-
     const tanlangan = selectedServices.length
       ? selectedServices.map((s) => s.title).join(", ")
       : "—"
@@ -47,7 +39,7 @@ export default function Ariza() {
 
     setIsSubmitting(true)
     try {
-      const res = await fetch(`https://formspree.io/f/${formId}`, {
+      const res = await fetch("/api/applications", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
