@@ -131,34 +131,25 @@ export default function Home() {
 
         <div>
           <h4 className="text-lg font-semibold text-white mb-3">
-            Services
+            Xizmatlar
           </h4>
           <ul className="space-y-2 text-sm">
-            <li>
-              <a href="/services/web">Web Development</a>
-            </li>
-            <li>
-              <a href="/services/security">Cyber Security</a>
-            </li>
-            <li>
-              <a href="/services/ai">AI Solutions</a>
-            </li>
-            <li>
-              <a href="/services/support">IT Support</a>
-            </li>
+            <li><a href="/#cards" className="hover:text-white transition">Web Development</a></li>
+            <li><a href="/#cards" className="hover:text-white transition">Cyber Security</a></li>
+            <li><a href="/#cards" className="hover:text-white transition">AI yechimlar</a></li>
+            <li><a href="/#cards" className="hover:text-white transition">IT qoʻllab-quvvatlash</a></li>
           </ul>
         </div>
 
-        
         <div>
           <h4 className="text-lg font-semibold text-white mb-3">
-            Quick Links
+            Sahifalar
           </h4>
           <ul className="space-y-2 text-sm">
-            <li><a href="/">Home</a></li>
-            <li><a href="/services">Services</a></li>
-            <li><a href="/about">About</a></li>
-            <li><a href="/contact">Contact</a></li>
+            <li><a href="/" className="hover:text-white transition">Bosh sahifa</a></li>
+            <li><a href="/#cards" className="hover:text-white transition">Xizmatlar</a></li>
+            <li><a href="/about" className="hover:text-white transition">Biz haqimizda</a></li>
+            <li><a href="/contact" className="hover:text-white transition">Aloqa</a></li>
           </ul>
         </div>
 
