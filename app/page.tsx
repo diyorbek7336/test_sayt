@@ -7,52 +7,89 @@ import Ariza from "../app/Component/Ariza"
 import Bagroundvideo from "./Component/Bagroundvideo";
 import Link from "next/link";
 
-export default function Home() {
-  
+type CounterProps = {
+  to: number;
+  durationMs?: number;
+  decimals?: number;
+  suffix?: string;
+};
 
+function Counter({ to, durationMs = 1500, decimals = 0, suffix = "" }: CounterProps) {
+  const [value, setValue] = useState(0);
+
+  useEffect(() => {
+    let frameId: number;
+    const start = performance.now();
+
+    const animate = (now: number) => {
+      const progress = Math.min((now - start) / durationMs, 1);
+      // ozgina yumshatilgan (ease-out) animatsiya
+      const eased = 1 - Math.pow(1 - progress, 3);
+      const current = to * eased;
+      setValue(current);
+      if (progress < 1) {
+        frameId = requestAnimationFrame(animate);
+      }
+    };
+
+    frameId = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(frameId);
+  }, [to, durationMs]);
+
+  return <span>{value.toFixed(decimals)}{suffix}</span>;
+}
+
+export default function Home() {
   return (
     <>
-   
-  <Header/>
-<main
-      className="relative bg-gray-900 text-white py-32 flex items-center justify-center">
-      <div className="relative z-10 text-center">
-        <h1 className="text-5xl sm:text-6xl font-bold mb-4 font-mono">Professional IT yechimlar bizda!</h1>
-        <p className="text-lg text-gray-200 mb-8 font-mono">Web development, network security, automation, CCTV services.</p>
-       <Link href="/Consultation"><button className="bg-blue-600 hover:bg-blue-500 px-6 py-3 rounded-full shadow-lg transition-all duration-300">Bepul konsultatsiya</button></Link>
-      </div>
-    </main>
-     
-<Bagroundvideo/>
+      <Header/>
+      <main className="relative h-[85vh] min-h-[480px] flex items-center justify-center overflow-hidden bg-gray-900 text-white">
+        <Bagroundvideo />
+        <div className="relative z-10 text-center px-4 py-8 animate-fade-in-up">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4 font-mono drop-shadow-lg">Professional IT yechimlar bizda!</h1>
+          <p className="text-base sm:text-lg text-gray-200 mb-6 font-mono max-w-2xl mx-auto">Web development, network security, automation, CCTV services.</p>
+          <Link href="/Consultation">
+            <button className="bg-gradient-to-r from-sky-500 to-indigo-500 hover:from-sky-400 hover:to-indigo-400 px-6 py-3 rounded-full shadow-lg transition-all duration-300 font-medium">
+              Bepul konsultatsiya
+            </button>
+          </Link>
+        </div>
+      </main>
 
-     <div id="cards"> <Card/></div>
-     <div id="manzil"><Location/></div>
-
-
-
+      <div id="cards" className="scroll-mt-4"><Card/></div>
+      <div id="manzil"><Location/></div>
 
 
 
 
-       <h2 className="text-4xl font-bold text-black mb-6 text-center mt-20">
+
+
+
+       <h2 className="text-4xl font-bold text-white mb-6 text-center mt-20">
   Nima uchun bizni tanlashadi?
 </h2>
-<p className="text-gray-700 text-center mb-12">
+<p className="text-gray-300 text-center mb-12">
   Biz mijozlarga eng samarali IT yechimlarni taqdim qilamiz, ish jarayonini soddalashtiramiz va xavfsizligini ta’minlaymiz.
 </p>
 
 <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 text-center mb-15">
-  <div className="bg-gray-800 p-6 rounded-2xl shadow-lg hover:scale-98 transition-transform duration-300">
-    <h3 className="text-5xl font-bold text-blue-500">1.5+</h3>
-    <p className="text-gray-300 mt-2">Yillik tajriba</p>
+  <div className="bg-slate-900/80 border border-slate-700/60 p-6 rounded-2xl shadow-lg hover:scale-98 transition-transform duration-300 animate-fade-in-up" style={{ animationDelay: "0.05s" }}>
+    <h3 className="text-5xl font-bold text-sky-400">
+      <Counter to={1.5} decimals={1} suffix="+" />
+    </h3>
+    <p className="text-slate-200 mt-2">Yillik tajriba</p>
   </div>
-  <div className="bg-gray-800 p-6 rounded-2xl shadow-lg hover:scale-98 transition-transform duration-300">
-    <h3 className="text-5xl font-bold text-green-500">20+</h3>
-    <p className="text-gray-300 mt-2">Tugatgan loyiha</p>
+  <div className="bg-slate-900/80 border border-slate-700/60 p-6 rounded-2xl shadow-lg hover:scale-98 transition-transform duration-300 animate-fade-in-up" style={{ animationDelay: "0.15s" }}>
+    <h3 className="text-5xl font-bold text-emerald-400">
+      <Counter to={20} decimals={0} suffix="+" />
+    </h3>
+    <p className="text-slate-200 mt-2">Tugatgan loyiha</p>
   </div>
-  <div className="bg-gray-800 p-6 rounded-2xl shadow-lg hover:scale-98 transition-transform duration-300">
-    <h3 className="text-5xl font-bold text-yellow-500">99%</h3>
-    <p className="text-gray-300 mt-2">Mijozlar qoniqishi</p>
+  <div className="bg-slate-900/80 border border-slate-700/60 p-6 rounded-2xl shadow-lg hover:scale-98 transition-transform duration-300 animate-fade-in-up" style={{ animationDelay: "0.25s" }}>
+    <h3 className="text-5xl font-bold text-amber-300">
+      <Counter to={99} decimals={0} suffix="%" />
+    </h3>
+    <p className="text-slate-200 mt-2">Mijozlar qoniqishi</p>
   </div>
   
 </div>
@@ -166,7 +203,9 @@ export default function Home() {
             </li>
             <li>
               <a href="tel:+998900000000">
-                +998 90 000 00 00
+                +998 94 204 91 07
+                <br />
+                +998 95 011 99 53
               </a>
             </li>
             <li>Tashkent, Uzbekistan</li>

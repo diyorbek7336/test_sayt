@@ -37,6 +37,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+# arizalar (shaxsiy ma'lumotlar)
+data/applications.json
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

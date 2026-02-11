@@ -52,47 +52,79 @@ export default function Card() {
   const [show, setShow] = useState(false)
   const { selectedServices, addService, removeService } = useSelectedServices()
 
+  // Xizmat tanlangan yoki yo'qligini tekshirish
+  const isServiceSelected = (serviceId: number) => {
+    return selectedServices.some(service => service.id === serviceId)
+  }
+
+  // Xizmatni tanlash yoki olib tashlash
+  const handleServiceToggle = (service: Service) => {
+    if (isServiceSelected(service.id)) {
+      removeService(service.id)
+    } else {
+      addService(service)
+    }
+  }
+
+  // Har bir xizmat uchun alohida sanani ko'rsatish
+  const getServiceCount = (serviceId: number) => {
+    return selectedServices.filter(service => service.id === serviceId).length
+  }
+
   return (
     <>
-      <section className="bg-gray-900 min-h-screen p-8 mt-55">
+      <section className="bg-gray-900 min-h-screen p-6 sm:p-8 pt-8 sm:pt-12">
         <div className="max-w-7xl mx-auto">
           <h1 className="text-4xl sm:text-5xl font-bold text-white mb-12 text-center">
             Bizning xizmatlar
           </h1>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {services.map((service) => (
-              <div
-                key={service.id}
-                className="relative bg-gray-800 p-6 rounded-2xl hover:bg-gray-700 transition cursor-pointer"
-              >
-                <div className="absolute -top-4 -right-4 w-16 h-16 bg-blue-500 opacity-20 rounded-full blur-3xl"></div>
+            {services.map((service) => {
+              const isSelected = isServiceSelected(service.id)
+              
+              return (
+                <div
+                  key={service.id}
+                  className={`relative p-6 rounded-2xl transition cursor-pointer ${
+                    isSelected 
+                      ? 'bg-blue-700 hover:bg-blue-600' 
+                      : 'bg-gray-800 hover:bg-gray-700'
+                  }`}
+                >
+                  <div className="absolute -top-4 -right-4 w-16 h-16 bg-blue-500 opacity-20 rounded-full blur-3xl"></div>
 
-                <img src={service.icon} className="w-12 h-12 mb-4" alt={service.title} />
-                <h3 className="text-lg font-semibold text-white font-mono">{service.title}</h3>
-                <p className="text-white text-sm mt-2 italic">{service.description}</p>
+                  <img src={service.icon} className="w-12 h-12 mb-4" alt={service.title} />
+                  <h3 className="text-lg font-semibold text-white font-mono">{service.title}</h3>
+                  <p className="text-white text-sm mt-2 italic">{service.description}</p>
 
-                <div className="flex justify-between items-center mt-4">
-                  <button
-                    className="bg-white text-black px-4 py-2 rounded-xl font-serif hover:bg-gray-200 transition"
-                    onClick={() => addService(service)}
-                  >
-                    Xizmatni tanlash
-                  </button>
-                  <button
-                    className="text-2xl hover:text-blue-400 transition"
-                    onClick={() => setShow(true)}
-                    title="Tanlangan xizmatlar"
-                  >
-                    🛒 {selectedServices.length > 0 && (
-                      <span className="text-sm align-top bg-blue-500 text-white rounded-full px-1.5">
-                        {selectedServices.length}
-                      </span>
-                    )}
-                  </button>
+                  <div className="flex justify-between items-center mt-4">
+                    <button
+                      className={`px-4 py-2 rounded-xl font-serif transition ${
+                        isSelected
+                          ? 'bg-white text-blue-700 hover:bg-gray-200'
+                          : 'bg-white text-black hover:bg-gray-200'
+                      }`}
+                      onClick={() => handleServiceToggle(service)}
+                    >
+                      {isSelected ? '✓ Tanlangan' : 'Xizmatni tanlash'}
+                    </button>
+                    <button
+                      className="text-2xl hover:text-blue-400 transition relative"
+                      onClick={() => setShow(true)}
+                      title="Tanlangan xizmatlar"
+                    >
+                      🛒 
+                      {getServiceCount(service.id) > 0 && (
+                        <span className="absolute -top-1 -right-1 text-xs bg-blue-500 text-white rounded-full w-5 h-5 flex items-center justify-center">
+                          {getServiceCount(service.id)}
+                        </span>
+                      )}
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         </div>
       </section>
@@ -137,8 +169,8 @@ export default function Card() {
                     </button>
                   </div>
                 ))}
-                <a
-                  href="#ariza"
+                
+                 <a href="#ariza"
                   onClick={() => setShow(false)}
                   className="block mt-4 text-center py-2 bg-blue-500 hover:bg-blue-600 rounded-lg text-white text-sm"
                 >
