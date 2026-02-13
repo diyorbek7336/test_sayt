@@ -43,7 +43,7 @@ export default function Home() {
   return (
     <>
       <Header/>
-      <main className="relative h-[85vh] min-h-[480px] flex items-center justify-center overflow-hidden bg-gray-900 text-white">
+      <main className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gray-900 text-white">
         <Bagroundvideo />
         <div className="relative z-10 text-center px-4 py-8 animate-fade-in-up">
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4 font-mono drop-shadow-lg">Professional IT yechimlar bizda!</h1>

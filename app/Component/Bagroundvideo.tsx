@@ -14,8 +14,7 @@ export default function Bagroundvideo() {
         <source src="/video/bgvideo.mp4" type="video/mp4" />
         Sizning brauzeringiz video qo‘llab-quvvatlamaydi.
       </video>
-
-      <div className="absolute inset-0 bg-black/40 pointer-events-none z-[1]" aria-hidden />
+      <div className="absolute inset-0 bg-black/40" aria-hidden />
     </>
   )
 }
