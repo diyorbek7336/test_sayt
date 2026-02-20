@@ -9,7 +9,6 @@ export default function BackgroundVideo() {
 
   return (
     <>
-     
       <div
         className={`absolute inset-0 w-full h-full transition-opacity duration-700 ${
           videoPlaying ? 'opacity-0' : 'opacity-100'
@@ -22,6 +21,8 @@ export default function BackgroundVideo() {
           fill
           priority
           className="object-cover"
+          style={{ objectPosition: 'center center' }}
+          sizes="100vw"
         />
       </div>
 
