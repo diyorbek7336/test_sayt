@@ -11,7 +11,6 @@ export async function POST(req: Request) {
 
     const data = {
       Ism: String(body.Ism ?? body.ism ?? "").trim(),
-      Familya: String(body.Familya ?? body.familya ?? "").trim(),
       Email: String(body.Email ?? body.email ?? "").trim(),
       Kompaniya: String(body.Kompaniya ?? body.kompaniya ?? "").trim(),
       Telefon: String(body.Telefon ?? body.telefon ?? "").trim(),
@@ -22,7 +21,8 @@ export async function POST(req: Request) {
       Vaqt: String(body.Vaqt ?? new Date().toLocaleString("uz-UZ")).trim(),
     }
 
-    if (!data.Ism || !data.Familya || !data.Email || !data.Telefon || !data.Xabar) {
+
+if (!data.Ism || !data.Email || !data.Telefon || !data.Xabar) { 
       return NextResponse.json(
         { error: "Ma'lumotlar to'liq emas" },
         { status: 400 }

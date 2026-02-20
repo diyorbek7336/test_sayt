@@ -38,7 +38,7 @@ export default function Ariza() {
 
     setIsSubmitting(true)
     try {
-      const res = await fetch("/API/applications", {
+      const res = await fetch("API/applications", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
