@@ -11,6 +11,12 @@ const services: Service[] = [
     description: "Tarmoq va tizim xavfsizligini ta'minlaymiz: firewall, penetration testing, monitoring.",
   },
   {
+    id: 7,
+    title: "AD DS / Active Directory",
+    icon: "https://img.icons8.com/ios-filled/100/ffffff/active-directory.png",
+    description: "Active Directory Domain Services orqali foydalanuvchilar, guruhlar va qurilmalarni markazlashtirilgan boshqaruv: GPO, DNS, DHCP integratsiyasi.",
+  },
+  {
     id: 2,
     title: "Automation",
     icon: "https://img.freepik.com/premium-vector/programmable-automation-icon-vector-image-can-be-used-cyberpunk_120816-305414.jpg",
@@ -39,6 +45,12 @@ const services: Service[] = [
     title: "Cloud Services",
     icon: "https://img.icons8.com/ios-filled/100/ffffff/cloud.png",
     description: "Bulutli serverlar, saqlash va backup yechimlari, virtual infratuzilma boshqaruvi.",
+  },
+  {
+    id: 8,
+    title: "IP Telefoniya",
+    icon: "https://thumbs.dreamstime.com/b/voip-technology-icon-internet-call-concept-connection-voice-over-network-sign-ip-service-software-phone-calls-vector-276323893.jpg",
+    description: "VoIP va IP-telefoniya tizimlarini o'rnatish va sozlash: Cisco, Asterisk, FreePBX; ichki va tashqi chaqiruvlarni boshqarish.",
   },
 ]
 
@@ -572,7 +584,7 @@ export default function Card() {
                     </button>
 
                     <button
-                      className={`cart-btn ${selectedServices.length > 0 ? "has-items" : ""}`}
+                      className={`cart-btn ${selected ? "has-items" : ""}`}
                       onClick={() => setShow(true)}
                       title="Tanlangan xizmatlar"
                     >
@@ -580,8 +592,8 @@ export default function Card() {
                         <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
                         <path d="M1 1h4l2.68 13.39a2 2 0 001.98 1.61h9.72a2 2 0 001.98-1.61L23 6H6"/>
                       </svg>
-                      {selectedServices.length > 0 && (
-                        <span className="cart-badge">{selectedServices.length}</span>
+                      {selected && (
+                        <span className="cart-badge">1</span>
                       )}
                     </button>
                   </div>
