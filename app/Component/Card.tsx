@@ -52,6 +52,12 @@ const services: Service[] = [
     icon: "https://thumbs.dreamstime.com/b/voip-technology-icon-internet-call-concept-connection-voice-over-network-sign-ip-service-software-phone-calls-vector-276323893.jpg",
     description: "VoIP va IP-telefoniya tizimlarini o'rnatish va sozlash: Cisco, Asterisk, FreePBX; ichki va tashqi chaqiruvlarni boshqarish.",
   },
+  {
+    id: 9,
+    title: "Face ID — Davomat",
+    icon: "https://img.icons8.com/ios-filled/100/ffffff/face-id.png",
+    description: "Xodimlarning keldi-ketdisini yuz tanish texnologiyasi orqali avtomatik nazorat qilish: real-vaqt hisoboti, HR tizimi bilan integratsiya va boshqaruv paneli.",
+  },
 ]
 
 export default function Card() {
@@ -90,7 +96,6 @@ export default function Card() {
 
         .cards-inner { max-width: 1100px; margin: 0 auto; position: relative; z-index: 1; }
 
-        /* header */
         .cards-label {
           font-family: 'Space Mono', monospace;
           font-size: 11px;
@@ -134,14 +139,12 @@ export default function Card() {
           line-height: 1.75;
         }
 
-        /* grid */
         .service-grid {
           display: grid;
           grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
           gap: 1.5rem;
         }
 
-        /* service card */
         .service-card {
           position: relative;
           background: rgba(10, 18, 35, 0.8);
@@ -173,7 +176,6 @@ export default function Card() {
           box-shadow: 0 24px 60px rgba(0,0,0,0.5), 0 0 40px rgba(56,189,248,0.07);
         }
 
-        /* selected state */
         .service-card.is-selected {
           border-color: rgba(56,189,248,0.4);
           background: rgba(14, 30, 55, 0.9);
@@ -188,7 +190,6 @@ export default function Card() {
           pointer-events: none;
         }
 
-        /* glow dot */
         .card-glow {
           position: absolute;
           top: -20px; right: -20px;
@@ -199,11 +200,8 @@ export default function Card() {
           pointer-events: none;
         }
 
-        .is-selected .card-glow {
-          background: rgba(56,189,248,0.22);
-        }
+        .is-selected .card-glow { background: rgba(56,189,248,0.22); }
 
-        /* icon */
         .card-icon-wrap {
           width: 56px; height: 56px;
           border-radius: 16px;
@@ -226,7 +224,6 @@ export default function Card() {
           object-fit: contain;
         }
 
-        /* text */
         .card-title {
           font-size: 1.1rem;
           font-weight: 700;
@@ -245,7 +242,6 @@ export default function Card() {
 
         .is-selected .card-desc { color: #bae6fd; }
 
-        /* bottom row */
         .card-footer {
           display: flex;
           align-items: center;
@@ -255,7 +251,6 @@ export default function Card() {
           z-index: 2;
         }
 
-        /* SELECT BUTTON */
         .select-btn {
           display: inline-flex;
           align-items: center;
@@ -297,7 +292,6 @@ export default function Card() {
 
         .check-icon { flex-shrink: 0; }
 
-        /* CART BUTTON */
         .cart-btn {
           position: relative;
           width: 42px; height: 42px;
@@ -340,7 +334,6 @@ export default function Card() {
           border: 2px solid #060912;
         }
 
-        /* ===== MODAL ===== */
         .modal-overlay {
           position: fixed; inset: 0;
           background: rgba(0,0,0,0.75);
@@ -380,7 +373,6 @@ export default function Card() {
           background: linear-gradient(90deg, transparent, rgba(56,189,248,0.4), transparent);
         }
 
-        /* modal header */
         .modal-header {
           display: flex;
           align-items: center;
@@ -428,7 +420,6 @@ export default function Card() {
           transform: scale(1.08);
         }
 
-        /* modal body */
         .modal-body {
           overflow-y: auto;
           padding: 1.25rem 1.5rem;
@@ -449,7 +440,6 @@ export default function Card() {
           text-align: center;
         }
 
-        /* modal item */
         .modal-item {
           display: flex;
           align-items: center;
@@ -505,7 +495,6 @@ export default function Card() {
           transform: scale(1.1);
         }
 
-        /* modal footer */
         .modal-footer {
           padding: 1rem 1.5rem 1.5rem;
           border-top: 1px solid rgba(56,189,248,0.08);
