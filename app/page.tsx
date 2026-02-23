@@ -6,6 +6,7 @@ import Location from "./Component/Location";
 import Ariza from "../app/Component/Ariza"
 import Bagroundvideo from "./Component/Bagroundvideo";
 import Link from "next/link";
+import AI from "../app/Component/Ai"
 
 type CounterProps = {
   to: number;
@@ -405,7 +406,6 @@ export default function Home() {
 
       <Header/>
 
-      {/* HERO */}
       <main className="hero-section">
         <Bagroundvideo />
         <div className="hero-glow" />
@@ -431,11 +431,10 @@ export default function Home() {
         </div>
       </main>
 
-      {/* CARDS & LOCATION */}
+
       <div id="cards" className="scroll-mt-4"><Card/></div>
       <div id="manzil"><Location/></div>
 
-      {/* WHY US */}
       <section className="why-section">
         <p className="section-label">// Nima uchun biz?</p>
         <h2 className="section-title">Raqamlar orqali ishonch</h2>
@@ -466,7 +465,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* CTA STRIP */}
+
       <div className="cta-strip">
         <p>Siz ham hoziroq IT yechimlarimizdan foydalaning!</p>
         <p className="small">Hoziroq bizga ariza qoldiring va bepul maslahat oling.</p>
@@ -479,8 +478,8 @@ export default function Home() {
       </div>
 
       <Ariza/>
-
-      {/* FOOTER */}
+<AI/>
+     
       <footer className="footer">
         <div className="footer-grid">
           <div>
