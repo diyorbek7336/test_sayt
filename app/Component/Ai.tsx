@@ -131,7 +131,7 @@ export default function ChatWidget() {
       const text = input.trim()
       setInput("")
 
-      // Search through FAQs for matching answer
+    
       let found = false
       for (const faq of FAQS) {
         for (const item of faq.questions) {
@@ -441,7 +441,7 @@ export default function ChatWidget() {
       `}</style>
 
       <div className="cw">
-        {/* Toggle */}
+
         <button className="cw-toggle" onClick={() => setOpen((o) => !o)}>
           {!open && <div className="cw-pulse" />}
           {open ? (
@@ -455,10 +455,10 @@ export default function ChatWidget() {
           )}
         </button>
 
-        {/* Window */}
+   
         {open && (
           <div className="cw-window">
-            {/* Header */}
+   
             <div className="cw-header">
               <div className="cw-avatar">🤖</div>
               <div style={{ flex: 1, minWidth: 0 }}>
@@ -481,8 +481,7 @@ export default function ChatWidget() {
                 </button>
               </div>
             </div>
-
-            {/* Messages */}
+\
             <div className="cw-msgs">
               {messages.map((msg, i) => (
                 <div key={i} className={`cw-msg ${msg.role}`}>
@@ -495,7 +494,6 @@ export default function ChatWidget() {
               <div ref={bottomRef} />
             </div>
 
-            {/* Category view */}
             {view === "categories" && (
               <div className="cw-options">
                 <div className="cw-opt-label">Mavzu tanlang</div>
@@ -511,7 +509,6 @@ export default function ChatWidget() {
               </div>
             )}
 
-            {/* Questions view */}
             {view === "questions" && activeCategory && (
               <>
                 <button className="cw-back" onClick={() => { setView("categories"); setActiveCategory(null); }}>
@@ -530,14 +527,14 @@ export default function ChatWidget() {
               </>
             )}
 
-            {/* After answer — show more button */}
+        
             {view === "chat" && (
               <button className="cw-more" onClick={() => { setView("categories"); setActiveCategory(null); }}>
                 ＋ Boshqa savol berish
               </button>
             )}
 
-            {/* Input */}
+         
             <div className="cw-input-wrap">
               <input
                 ref={inputRef}

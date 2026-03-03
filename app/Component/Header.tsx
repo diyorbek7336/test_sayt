@@ -15,10 +15,10 @@ export default function Header() {
         <div className="flex items-center justify-between rounded-full bg-gray-900/80 backdrop-blur border border-white/10 px-4 sm:px-6 py-2 shadow-lg">
           <Link href="/" className="flex items-center gap-2">
             <span className="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center text-white text-xl font-bold">
-              S
+              <img src="https://play-lh.googleusercontent.com/JReTwiaHtg6_p7uLNw9KrIwXrEDSSs3vAjdzLrc6_aXo7FGhik_BlFJ7ONlRLSeDTks" alt="" />
             </span>
             <span className="text-white text-lg sm:text-xl font-semibold tracking-tight">
-              Server ITuz
+              CyberQalqon
             </span>
           </Link>
 
