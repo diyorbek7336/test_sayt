@@ -3,6 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { SelectedServicesProvider } from "./context/SelectedServicesContext";
 import ChatWidget from "./Component/Ai";
+import Loader from "./Component/Loader"
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,6 +33,7 @@ export default function RootLayout({
       >
         <SelectedServicesProvider>
           {children}
+          <Loader/>
           <ChatWidget/>
         </SelectedServicesProvider>
       </body>
