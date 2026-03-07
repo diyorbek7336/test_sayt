@@ -1,494 +1,457 @@
 'use client'
-import { useEffect, useState, useRef } from "react"
+import { useEffect, useState, useRef, useCallback } from "react"
 import Header from "./Component/Header";
 import Card from "../app/Component/Card"
 import Location from "./Component/Location";
 import Ariza from "../app/Component/Ariza"
-import Bagroundvideo from "./Component/Bagroundvideo";
 import Link from "next/link";
 import AI from "../app/Component/Ai"
+import FloatingParticles from "./Component/FloatingParticles";
 
-type CounterProps = {
-  to: number;
-  durationMs?: number;
-  decimals?: number;
-  suffix?: string;
-};
-
+// ─── Counter ────────────────────────────────────────────────────────────────
+type CounterProps = { to: number; durationMs?: number; decimals?: number; suffix?: string };
 function Counter({ to, durationMs = 1500, decimals = 0, suffix = "" }: CounterProps) {
   const [value, setValue] = useState(0);
   const [started, setStarted] = useState(false);
   const ref = useRef<HTMLSpanElement>(null);
-
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting && !started) {
-          setStarted(true);
-        }
-      },
-      { threshold: 0.5 }
-    );
-    if (ref.current) observer.observe(ref.current);
-    return () => observer.disconnect();
+    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting && !started) setStarted(true); }, { threshold: 0.5 });
+    if (ref.current) obs.observe(ref.current);
+    return () => obs.disconnect();
   }, [started]);
-
   useEffect(() => {
     if (!started) return;
-    let frameId: number;
-    const start = performance.now();
-    const animate = (now: number) => {
-      const progress = Math.min((now - start) / durationMs, 1);
-      const eased = 1 - Math.pow(1 - progress, 3);
-      setValue(to * eased);
-      if (progress < 1) frameId = requestAnimationFrame(animate);
+    let id: number;
+    const t0 = performance.now();
+    const tick = (now: number) => {
+      const p = Math.min((now - t0) / durationMs, 1);
+      setValue(to * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) id = requestAnimationFrame(tick);
     };
-    frameId = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(frameId);
+    id = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(id);
   }, [started, to, durationMs]);
-
   return <span ref={ref}>{value.toFixed(decimals)}{suffix}</span>;
 }
+
+// ─── Terminal logic ──────────────────────────────────────────────────────────
+const PAGES = [
+  { name: "Bosh sahifa", path: "/"          },
+  { name: "Xizmatlar",   path: "/xizmatlar" },
+  { name: "Loyihalar",   path: "/loyihalar" },
+  { name: "Haqimizda",   path: "/haqimizda" },
+  { name: "Bog'lanish",  path: "/boglanish" },
+];
+
+function runCmd(raw: string): string[] {
+  const parts = raw.trim().split(/\s+/);
+  const cmd = parts[0];
+  const args = parts.slice(1).join(" ");
+  switch (cmd) {
+    case "help": return [
+      "Mavjud buyruqlar:",
+      "  ls            — sahifalar ro'yxati",
+      "  cd <sahifa>   — sahifaga o'tish",
+      "  pwd           — joriy yo'l",
+      "  cat <sahifa>  — sahifa haqida",
+      "  whoami        — foydalanuvchi",
+      "  contact       — bog'lanish",
+      "  clear         — tozalash",
+      "  help          — yordam",
+    ];
+    case "ls": return [
+      "total " + PAGES.length,
+      ...PAGES.map(p => `  ${p.path.padEnd(14)} ${p.name}`),
+    ];
+    case "pwd": return ["/home/user/cyberqalqon"];
+    case "cd": {
+      if (!args) return ["cd: argument kerak"];
+      const p = PAGES.find(x => x.path === args || x.path === "/" + args || x.name.toLowerCase().includes(args.toLowerCase()));
+      if (!p) return [`cd: ${args}: No such file or directory`];
+      return [`__NAV__${p.path}`, `${p.name} sahifasiga o'tilmoqda...`];
+    }
+    case "cat": {
+      if (!args) return ["cat: fayl nomi kerak"];
+      const p = PAGES.find(x => x.path === args || x.path.slice(1) === args || x.name.toLowerCase().includes(args.toLowerCase()));
+      if (!p) return [`cat: ${args}: No such file or directory`];
+      return [`# ${p.name}`, `path: ${p.path}`];
+    }
+    case "whoami": return ["user"];
+    case "contact": return [
+      "Email:    info@cyberqalqon.uz",
+      "Telegram: @cyberqalqon",
+      "GitHub:   github.com/cyberqalqon",
+    ];
+    case "clear": return ["__CLEAR__"];
+    case "": return [];
+    default: return [`${cmd}: command not found`];
+  }
+}
+
+// ─── Inline Terminal Component ───────────────────────────────────────────────
+function InlineTerminal() {
+  const [isRoot,  setIsRoot]  = useState(false);
+  const [lines,   setLines]   = useState<{ type?: string; text: string; prompt?: string }[]>([
+    { text: "CyberQalqon v2.0  —  'help' yozing" },
+    { text: "" },
+  ]);
+  const [current, setCurrent] = useState("");
+  const [hist,    setHist]    = useState<string[]>([]);
+  const [hIdx,    setHIdx]    = useState(-1);
+  const [blink,   setBlink]   = useState(true);
+  const [active,  setActive]  = useState(false);
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const endRef  = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const id = setInterval(() => setBlink(b => !b), 530);
+    return () => clearInterval(id);
+  }, []);
+
+  useEffect(() => {
+    endRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [lines, current]);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (!wrapRef.current?.contains(e.target as Node)) setActive(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  const promptStr = useCallback(() =>
+    isRoot ? "root@cyberqalqon:~#" : "user@cyberqalqon:~$"
+  , [isRoot]);
+
+  const submit = useCallback(() => {
+    const raw = current.trim();
+    if (raw === "root") {
+      setIsRoot(true);
+      setLines(l => [...l, { type:"input", text: raw, prompt: promptStr() }, { text: "root@cyberqalqon:~#  — xush kelibsiz!" }]);
+      if (raw) setHist(h => [raw, ...h]);
+      setHIdx(-1); setCurrent(""); return;
+    }
+    const result  = runCmd(raw);
+    const navCmd  = result.find(r => r.startsWith("__NAV__"));
+    const isClear = result.includes("__CLEAR__");
+    const visible = result.filter(r => !r.startsWith("__NAV__") && r !== "__CLEAR__");
+    if (isClear) {
+      setLines([]);
+    } else {
+      setLines(l => [...l,
+        { type:"input", text: raw, prompt: promptStr() },
+        ...visible.map(t => ({ text: t })),
+      ]);
+    }
+    if (navCmd) setTimeout(() => window.location.href = navCmd.replace("__NAV__",""), 300);
+    if (raw) setHist(h => [raw, ...h]);
+    setHIdx(-1); setCurrent("");
+  }, [current, promptStr]);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (!active) return;
+      if ([" ","ArrowUp","ArrowDown","ArrowLeft","ArrowRight","Tab"].includes(e.key)) e.preventDefault();
+      if (e.ctrlKey) {
+        if (e.key === "l") { e.preventDefault(); setLines([]); return; }
+        if (e.key === "c") { setLines(l => [...l, { type:"input", text:current, prompt:promptStr() }, { text:"^C" }]); setCurrent(""); return; }
+        return;
+      }
+      if (e.key === "Enter")     { submit(); return; }
+      if (e.key === "Backspace") { setCurrent(c => c.slice(0,-1)); return; }
+      if (e.key === "ArrowUp")   { const i = Math.min(hIdx+1, hist.length-1); setHIdx(i); setCurrent(hist[i]||""); return; }
+      if (e.key === "ArrowDown") { const i = Math.max(hIdx-1,-1); setHIdx(i); setCurrent(i===-1?"":hist[i]); return; }
+      if (e.key.length === 1)    { setCurrent(c => c + e.key); }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [active, current, hist, hIdx, submit, promptStr]);
+
+  const accent = isRoot ? "#ef4444" : "#4ade80";
+  const borderColor = active
+    ? (isRoot ? "rgba(239,68,68,0.55)" : "rgba(74,222,128,0.45)")
+    : (isRoot ? "rgba(239,68,68,0.2)"  : "rgba(74,222,128,0.13)");
+  const glowColor = isRoot ? "rgba(239,68,68,0.12)" : "rgba(74,222,128,0.08)";
+
+  return (
+    <div
+      ref={wrapRef}
+      onMouseDown={() => setActive(true)}
+      style={{
+        fontFamily: "'JetBrains Mono','Fira Code',monospace",
+        fontSize: "12.5px",
+        lineHeight: 1.7,
+        width: "100%",
+        maxWidth: 520,
+        borderRadius: 9,
+        overflow: "hidden",
+        background: "#0d0d0d",
+        border: `1px solid ${borderColor}`,
+        boxShadow: `0 0 0 1px rgba(0,0,0,0.5), 0 20px 50px rgba(0,0,0,0.8), 0 0 50px ${glowColor}`,
+        transition: "border-color .3s, box-shadow .45s",
+        cursor: "text",
+        userSelect: "none",
+      }}
+    >
+      {/* Title bar */}
+      <div style={{ display:"flex", alignItems:"center", gap:6, padding:"9px 13px", background:"#111", borderBottom:"1px solid rgba(255,255,255,0.05)" }}>
+        <div style={{ width:11, height:11, borderRadius:"50%", background:"#ff5f57" }} />
+        <div style={{ width:11, height:11, borderRadius:"50%", background:"#febc2e" }} />
+        <div style={{ width:11, height:11, borderRadius:"50%", background:"#28c840" }} />
+        <span style={{ flex:1, textAlign:"center", fontSize:10.5, letterSpacing:"0.18em", textTransform:"uppercase", color:"rgba(255,255,255,0.16)" }}>
+          {isRoot ? "root@cyberqalqon — bash" : "user@cyberqalqon — bash"}
+        </span>
+        <span style={{ fontSize:9, color:"rgba(255,255,255,0.12)", letterSpacing:"0.05em" }}>
+          {active ? "● yozish" : "○ bosing"}
+        </span>
+      </div>
+
+
+      <div
+        style={{ height:260, overflowY:"auto", padding:"12px 15px 8px", color:"#a3a3a3" }}
+        onClick={() => setActive(true)}
+      >
+        {lines.map((ln, i) => (
+          <div key={i} style={{ whiteSpace:"pre-wrap", wordBreak:"break-all", minHeight:"1em" }}>
+            {ln.type === "input" ? (
+              <>
+                <span style={{ color: accent, fontWeight:500 }}>{ln.prompt}&nbsp;</span>
+                <span style={{ color:"#e5e5e5" }}>{ln.text}</span>
+              </>
+            ) : (
+              <span style={{ color:"#a3a3a3" }}>{ln.text}</span>
+            )}
+          </div>
+        ))}
+
+   
+        <div style={{ whiteSpace:"pre-wrap", wordBreak:"break-all", minHeight:"1em" }}>
+          <span style={{ color: accent, fontWeight:500, transition:"color .45s" }}>{promptStr()}&nbsp;</span>
+          <span style={{ color:"#e5e5e5" }}>{current}</span>
+          {active && (
+            <span style={{
+              display:"inline-block", width:7, height:13, borderRadius:1.5,
+              verticalAlign:"middle", marginLeft:2,
+              background: blink ? accent : "transparent",
+              boxShadow: blink ? `0 0 8px ${accent}` : "none",
+              transition:"background .45s",
+            }} />
+          )}
+        </div>
+        <div ref={endRef} />
+      </div>
+    </div>
+  );
+}
+
 
 export default function Home() {
   return (
     <>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap');
-
         * { box-sizing: border-box; }
+        body { background: #060912; font-family: 'Outfit', sans-serif; }
 
-        body {
-          background: #060912;
-          font-family: 'Outfit', sans-serif;
-        }
-
-        /* ---- HERO ---- */
         .hero-section {
-          position: relative;
-          min-height: 100vh;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          overflow: hidden;
-          background: #060912;
+          position: relative; min-height: 100vh;
+          display: flex; align-items: center; justify-content: center;
+          overflow: hidden; background: #060912;
         }
-
         .hero-glow {
-          position: absolute;
-          inset: 0;
+          position:absolute; inset:0; pointer-events:none; z-index:1;
           background:
-            radial-gradient(ellipse 70% 50% at 50% 0%, rgba(56,189,248,0.12) 0%, transparent 70%),
-            radial-gradient(ellipse 40% 40% at 20% 80%, rgba(99,102,241,0.10) 0%, transparent 60%);
-          pointer-events: none;
-          z-index: 1;
+            radial-gradient(ellipse 70% 50% at 50% 0%, rgba(56,189,248,0.10) 0%, transparent 70%),
+            radial-gradient(ellipse 40% 40% at 20% 80%, rgba(99,102,241,0.08) 0%, transparent 60%);
         }
-
         .hero-grid {
-          position: absolute;
-          inset: 0;
+          position:absolute; inset:0; z-index:1; pointer-events:none;
           background-image:
-            linear-gradient(rgba(56,189,248,0.04) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(56,189,248,0.04) 1px, transparent 1px);
+            linear-gradient(rgba(56,189,248,0.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(56,189,248,0.03) 1px, transparent 1px);
           background-size: 60px 60px;
-          z-index: 1;
-          pointer-events: none;
         }
-
         .hero-content {
-          position: relative;
-          z-index: 10;
-          text-align: center;
-          padding: 2rem 1.5rem;
-          animation: fadeUp 0.9s cubic-bezier(.16,1,.3,1) both;
+          position:relative; z-index:10; text-align:center; padding:2rem 1.5rem;
+          animation:fadeUp 0.9s cubic-bezier(.16,1,.3,1) both;
+          pointer-events:none;
         }
-
+        .hero-content a, .hero-content button { pointer-events:auto; }
         @keyframes fadeUp {
-          from { opacity: 0; transform: translateY(32px); }
-          to   { opacity: 1; transform: translateY(0); }
+          from { opacity:0; transform:translateY(32px); }
+          to   { opacity:1; transform:translateY(0); }
         }
-
         .hero-badge {
-          display: inline-flex;
-          align-items: center;
-          gap: 8px;
-          background: rgba(56,189,248,0.08);
-          border: 1px solid rgba(56,189,248,0.2);
-          border-radius: 100px;
-          padding: 6px 18px;
-          font-size: 13px;
-          color: #7dd3fc;
-          letter-spacing: 0.05em;
-          font-family: 'Space Mono', monospace;
-          margin-bottom: 2rem;
+          display:inline-flex; align-items:center; gap:8px;
+          background:rgba(56,189,248,0.08); border:1px solid rgba(56,189,248,0.2);
+          border-radius:100px; padding:6px 18px; font-size:13px; color:#7dd3fc;
+          letter-spacing:0.05em; font-family:'Space Mono',monospace; margin-bottom:2rem;
         }
-
         .hero-badge-dot {
-          width: 7px; height: 7px;
-          border-radius: 50%;
-          background: #38bdf8;
-          box-shadow: 0 0 8px #38bdf8;
-          animation: pulse 2s infinite;
+          width:7px; height:7px; border-radius:50%;
+          background:#38bdf8; box-shadow:0 0 8px #38bdf8; animation:pulse 2s infinite;
         }
-
-        @keyframes pulse {
-          0%,100% { opacity: 1; transform: scale(1); }
-          50%      { opacity: 0.5; transform: scale(1.3); }
-        }
-
+        @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(1.3)} }
         .hero-title {
-          font-size: clamp(2.2rem, 6vw, 4.5rem);
-          font-weight: 800;
-          line-height: 1.1;
-          color: #f0f6ff;
-          margin-bottom: 1.5rem;
-          letter-spacing: -0.02em;
+          font-size:clamp(2.2rem,6vw,4.5rem); font-weight:800; line-height:1.1;
+          color:#f0f6ff; margin-bottom:1.5rem; letter-spacing:-0.02em;
         }
-
         .hero-title span {
-          background: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
+          background:linear-gradient(135deg,#38bdf8 0%,#818cf8 100%);
+          -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
         }
-
         .hero-sub {
-          font-size: clamp(1rem, 2vw, 1.2rem);
-          color: #94a3b8;
-          max-width: 560px;
-          margin: 0 auto 2.5rem;
-          font-weight: 300;
-          line-height: 1.7;
+          font-size:clamp(1rem,2vw,1.2rem); color:#94a3b8;
+          max-width:560px; margin:0 auto 2.5rem; font-weight:300; line-height:1.7;
         }
-
         .hero-btn {
-          display: inline-flex;
-          align-items: center;
-          gap: 10px;
-          background: linear-gradient(135deg, #0ea5e9, #6366f1);
-          color: #fff;
-          font-family: 'Outfit', sans-serif;
-          font-weight: 600;
-          font-size: 1rem;
-          padding: 14px 32px;
-          border-radius: 100px;
-          border: none;
-          cursor: pointer;
-          box-shadow: 0 0 32px rgba(14,165,233,0.3);
-          transition: transform 0.2s, box-shadow 0.2s;
-          text-decoration: none;
+          display:inline-flex; align-items:center; gap:10px;
+          background:linear-gradient(135deg,#0ea5e9,#6366f1); color:#fff;
+          font-family:'Outfit',sans-serif; font-weight:600; font-size:1rem;
+          padding:14px 32px; border-radius:100px; border:none; cursor:pointer;
+          box-shadow:0 0 32px rgba(14,165,233,0.3);
+          transition:transform 0.2s,box-shadow 0.2s; text-decoration:none;
+        }
+        .hero-btn:hover { transform:translateY(-2px) scale(1.03); box-shadow:0 0 48px rgba(14,165,233,0.45); }
+
+        .terminal-section {
+          position:relative; overflow:hidden; background:#060912;
+          padding:80px 1.5rem; display:flex; align-items:center;
+          justify-content:center; min-height:460px;
+        }
+        .terminal-inner {
+          position:relative; z-index:10; display:flex;
+          flex-direction:column; align-items:center; gap:1.2rem;
+          width:100%; max-width:560px;
+        }
+        .terminal-label {
+          font-family:'Space Mono',monospace; font-size:11px;
+          letter-spacing:0.2em; text-transform:uppercase; color:#38bdf8;
         }
 
-        .hero-btn:hover {
-          transform: translateY(-2px) scale(1.03);
-          box-shadow: 0 0 48px rgba(14,165,233,0.45);
-        }
-
-        /* ---- SECTION WRAPPER ---- */
-        .section-wrap {
-          max-width: 1100px;
-          margin: 0 auto;
-          padding: 0 1.5rem;
-        }
-
-        /* ---- WHY US ---- */
-        .why-section {
-          padding: 100px 1.5rem 60px;
-          text-align: center;
-        }
-
+        .why-section { padding:100px 1.5rem 60px; text-align:center; }
         .section-label {
-          font-family: 'Space Mono', monospace;
-          font-size: 11px;
-          letter-spacing: 0.2em;
-          text-transform: uppercase;
-          color: #38bdf8;
-          margin-bottom: 1rem;
+          font-family:'Space Mono',monospace; font-size:11px;
+          letter-spacing:0.2em; text-transform:uppercase; color:#38bdf8; margin-bottom:1rem;
         }
+        .section-title { font-size:clamp(1.8rem,4vw,2.8rem); font-weight:700; color:#e8f0fe; margin-bottom:1rem; letter-spacing:-0.02em; }
+        .section-sub { color:#64748b; font-size:1.05rem; max-width:520px; margin:0 auto 3.5rem; line-height:1.7; }
 
-        .section-title {
-          font-size: clamp(1.8rem, 4vw, 2.8rem);
-          font-weight: 700;
-          color: #e8f0fe;
-          margin-bottom: 1rem;
-          letter-spacing: -0.02em;
-        }
-
-        .section-sub {
-          color: #64748b;
-          font-size: 1.05rem;
-          max-width: 520px;
-          margin: 0 auto 3.5rem;
-          line-height: 1.7;
-        }
-
-        /* ---- COUNTER CARDS ---- */
-        .counter-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-          gap: 1.5rem;
-          max-width: 900px;
-          margin: 0 auto 4rem;
-        }
-
+        .counter-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:1.5rem; max-width:900px; margin:0 auto 4rem; }
         .counter-card {
-          position: relative;
-          background: rgba(15,23,42,0.7);
-          border: 1px solid rgba(56,189,248,0.1);
-          border-radius: 24px;
-          padding: 2.5rem 2rem;
-          text-align: center;
-          overflow: hidden;
-          transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
-          backdrop-filter: blur(12px);
-          animation: fadeUp 0.7s cubic-bezier(.16,1,.3,1) both;
+          position:relative; background:rgba(15,23,42,0.7);
+          border:1px solid rgba(56,189,248,0.1); border-radius:24px; padding:2.5rem 2rem;
+          text-align:center; overflow:hidden; backdrop-filter:blur(12px);
+          transition:transform 0.3s,border-color 0.3s,box-shadow 0.3s;
+          animation:fadeUp 0.7s cubic-bezier(.16,1,.3,1) both;
         }
-
         .counter-card::before {
-          content: '';
-          position: absolute;
-          inset: 0;
-          border-radius: 24px;
-          background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(56,189,248,0.07), transparent);
-          pointer-events: none;
+          content:''; position:absolute; inset:0; border-radius:24px;
+          background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(56,189,248,0.07),transparent); pointer-events:none;
         }
+        .counter-card:hover { transform:translateY(-6px); border-color:rgba(56,189,248,0.3); box-shadow:0 20px 60px rgba(0,0,0,0.4),0 0 40px rgba(56,189,248,0.08); }
+        .counter-num { font-size:3.5rem; font-weight:800; line-height:1; margin-bottom:0.75rem; letter-spacing:-0.03em; }
+        .counter-num.sky   { color:#38bdf8; text-shadow:0 0 30px rgba(56,189,248,0.4); }
+        .counter-num.green { color:#34d399; text-shadow:0 0 30px rgba(52,211,153,0.4); }
+        .counter-num.amber { color:#fbbf24; text-shadow:0 0 30px rgba(251,191,36,0.4); }
+        .counter-label { color:#94a3b8; font-size:0.95rem; font-weight:400; }
 
-        .counter-card:hover {
-          transform: translateY(-6px);
-          border-color: rgba(56,189,248,0.3);
-          box-shadow: 0 20px 60px rgba(0,0,0,0.4), 0 0 40px rgba(56,189,248,0.08);
-        }
-
-        .counter-num {
-          font-size: 3.5rem;
-          font-weight: 800;
-          line-height: 1;
-          margin-bottom: 0.75rem;
-          letter-spacing: -0.03em;
-        }
-
-        .counter-num.sky   { color: #38bdf8; text-shadow: 0 0 30px rgba(56,189,248,0.4); }
-        .counter-num.green { color: #34d399; text-shadow: 0 0 30px rgba(52,211,153,0.4); }
-        .counter-num.amber { color: #fbbf24; text-shadow: 0 0 30px rgba(251,191,36,0.4); }
-
-        .counter-label {
-          color: #94a3b8;
-          font-size: 0.95rem;
-          font-weight: 400;
-        }
-
-        /* ---- CTA STRIP ---- */
-        .cta-strip {
-          text-align: center;
-          padding: 0 1.5rem 80px;
-        }
-
-        .cta-strip p {
-          color: #cbd5e1;
-          font-size: 1.15rem;
-          margin-bottom: 0.75rem;
-        }
-
-        .cta-strip p.small {
-          color: #64748b;
-          font-size: 0.95rem;
-          margin-bottom: 2rem;
-        }
-
+        .cta-strip { text-align:center; padding:0 1.5rem 80px; }
+        .cta-strip p { color:#cbd5e1; font-size:1.15rem; margin-bottom:0.75rem; }
+        .cta-strip p.small { color:#64748b; font-size:0.95rem; margin-bottom:2rem; }
         .cta-btn {
-          display: inline-flex;
-          align-items: center;
-          gap: 8px;
-          background: transparent;
-          border: 1.5px solid rgba(56,189,248,0.35);
-          color: #7dd3fc;
-          font-family: 'Outfit', sans-serif;
-          font-weight: 600;
-          font-size: 1rem;
-          padding: 14px 36px;
-          border-radius: 100px;
-          cursor: pointer;
-          transition: all 0.25s;
-          text-decoration: none;
+          display:inline-flex; align-items:center; gap:8px; background:transparent;
+          border:1.5px solid rgba(56,189,248,0.35); color:#7dd3fc;
+          font-family:'Outfit',sans-serif; font-weight:600; font-size:1rem;
+          padding:14px 36px; border-radius:100px; cursor:pointer;
+          transition:all 0.25s; text-decoration:none;
         }
+        .cta-btn:hover { background:rgba(56,189,248,0.1); border-color:rgba(56,189,248,0.6); color:#e0f2fe; box-shadow:0 0 24px rgba(56,189,248,0.15); transform:translateY(-2px); }
 
-        .cta-btn:hover {
-          background: rgba(56,189,248,0.1);
-          border-color: rgba(56,189,248,0.6);
-          color: #e0f2fe;
-          box-shadow: 0 0 24px rgba(56,189,248,0.15);
-          transform: translateY(-2px);
-        }
-
-        /* ---- FOOTER ---- */
-        .footer {
-          background: #04070f;
-          border-top: 1px solid rgba(56,189,248,0.07);
-          color: #475569;
-          padding: 64px 1.5rem 0;
-        }
-
-        .footer-grid {
-          max-width: 1100px;
-          margin: 0 auto;
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-          gap: 2.5rem;
-          padding-bottom: 3rem;
-        }
-
-        .footer-brand {
-          font-size: 1.3rem;
-          font-weight: 700;
-          color: #e2e8f0;
-          margin-bottom: 0.75rem;
-          letter-spacing: -0.01em;
-        }
-
-        .footer-brand span {
-          color: #38bdf8;
-        }
-
-        .footer-desc {
-          font-size: 0.88rem;
-          line-height: 1.7;
-          color: #475569;
-        }
-
-        .footer-heading {
-          font-size: 0.85rem;
-          font-weight: 600;
-          color: #94a3b8;
-          letter-spacing: 0.1em;
-          text-transform: uppercase;
-          margin-bottom: 1.2rem;
-          font-family: 'Space Mono', monospace;
-        }
-
-        .footer-list {
-          list-style: none;
-          padding: 0;
-          margin: 0;
-          display: flex;
-          flex-direction: column;
-          gap: 0.65rem;
-        }
-
-        .footer-list a {
-          font-size: 0.9rem;
-          color: #475569;
-          text-decoration: none;
-          transition: color 0.2s;
-        }
-
-        .footer-list a:hover {
-          color: #7dd3fc;
-        }
-
-        .footer-bottom {
-          border-top: 1px solid rgba(255,255,255,0.05);
-          text-align: center;
-          padding: 1.5rem;
-          font-size: 0.82rem;
-          color: #334155;
-          font-family: 'Space Mono', monospace;
-        }
-
-        /* ---- DIVIDER ---- */
-        .divider {
-          width: 60px;
-          height: 3px;
-          background: linear-gradient(90deg, #38bdf8, #6366f1);
-          border-radius: 10px;
-          margin: 0 auto 1.5rem;
-        }
+        .footer { background:#04070f; border-top:1px solid rgba(56,189,248,0.07); color:#475569; padding:64px 1.5rem 0; }
+        .footer-grid { max-width:1100px; margin:0 auto; display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:2.5rem; padding-bottom:3rem; }
+        .footer-brand { font-size:1.3rem; font-weight:700; color:#e2e8f0; margin-bottom:0.75rem; }
+        .footer-brand span { color:#38bdf8; }
+        .footer-desc { font-size:0.88rem; line-height:1.7; color:#475569; }
+        .footer-heading { font-size:0.85rem; font-weight:600; color:#94a3b8; letter-spacing:0.1em; text-transform:uppercase; margin-bottom:1.2rem; font-family:'Space Mono',monospace; }
+        .footer-list { list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:0.65rem; }
+        .footer-list a { font-size:0.9rem; color:#475569; text-decoration:none; transition:color 0.2s; }
+        .footer-list a:hover { color:#7dd3fc; }
+        .footer-bottom { border-top:1px solid rgba(255,255,255,0.05); text-align:center; padding:1.5rem; font-size:0.82rem; color:#334155; font-family:'Space Mono',monospace; }
+        .divider { width:60px; height:3px; background:linear-gradient(90deg,#38bdf8,#6366f1); border-radius:10px; margin:0 auto 1.5rem; }
       `}</style>
 
       <Header/>
 
       <main className="hero-section">
-        <Bagroundvideo />
         <div className="hero-glow" />
         <div className="hero-grid" />
+        <FloatingParticles color="56,189,248" count={85} />
         <div className="hero-content">
-          <div className="hero-badge">
-            <span className="hero-badge-dot" />
-            Professional IT Xizmatlari
-          </div>
-          <h1 className="hero-title">
-            Biznesingiz uchun<br/>
-            <span>aqlli IT yechimlar</span>
-          </h1>
-          <p className="hero-sub">
-            Web development, network security, automation va CCTV xizmatlarida ishonchli hamkoringiz.
-          </p>
+          <div className="hero-badge"><span className="hero-badge-dot" />Professional IT Xizmatlari</div>
+          <h1 className="hero-title">Biznesingiz uchun<br/><span>aqlli IT yechimlar</span></h1>
+          <p className="hero-sub">Web development, network security, automation va CCTV xizmatlarida ishonchli hamkoringiz.</p>
           <Link href="/Consultation" className="hero-btn">
             Bepul konsultatsiya
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M5 12h14M12 5l7 7-7 7"/>
-            </svg>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
           </Link>
         </div>
       </main>
 
-
       <div id="cards" className="scroll-mt-4"><Card/></div>
       <div id="manzil"><Location/></div>
 
+      {/* TERMINAL SECTION */}
+      <section className="terminal-section">
+        <FloatingParticles color="56,189,248" count={55} />
+        <div style={{ position:"absolute", inset:0, zIndex:3, pointerEvents:"none", background:"radial-gradient(ellipse 50% 70% at 50% 50%, rgba(56,189,248,0.05) 0%, transparent 70%)" }}/>
+        <div className="terminal-inner">
+          <p className="terminal-label">// interaktiv terminal</p>
+          <InlineTerminal />
+        </div>
+      </section>
+
+  
       <section className="why-section">
         <p className="section-label">// Nima uchun biz?</p>
         <h2 className="section-title">Raqamlar orqali ishonch</h2>
         <div className="divider" />
-        <p className="section-sub">
-          Biz mijozlarga eng samarali IT yechimlarni taqdim qilamiz, ish jarayonini soddalashtiramiz va xavfsizligini ta'minlaymiz.
-        </p>
-
+        <p className="section-sub">Biz mijozlarga eng samarali IT yechimlarni taqdim qilamiz, ish jarayonini soddalashtiramiz va xavfsizligini ta'minlaymiz.</p>
         <div className="counter-grid">
-          <div className="counter-card" style={{ animationDelay: "0.05s" }}>
-            <div className="counter-num sky">
-              <Counter to={1.5} decimals={1} suffix="+" durationMs={1500} />
-            </div>
+          <div className="counter-card" style={{animationDelay:"0.05s"}}>
+            <div className="counter-num sky"><Counter to={1.5} decimals={1} suffix="+" durationMs={1500}/></div>
             <p className="counter-label">Yillik tajriba</p>
           </div>
-          <div className="counter-card" style={{ animationDelay: "0.15s" }}>
-            <div className="counter-num green">
-              <Counter to={20} decimals={0} suffix="+" durationMs={1800} />
-            </div>
+          <div className="counter-card" style={{animationDelay:"0.15s"}}>
+            <div className="counter-num green"><Counter to={20} decimals={0} suffix="+" durationMs={1800}/></div>
             <p className="counter-label">Tugatgan loyiha</p>
           </div>
-          <div className="counter-card" style={{ animationDelay: "0.25s" }}>
-            <div className="counter-num amber">
-              <Counter to={99} decimals={0} suffix="%" durationMs={2000} />
-            </div>
+          <div className="counter-card" style={{animationDelay:"0.25s"}}>
+            <div className="counter-num amber"><Counter to={99} decimals={0} suffix="%" durationMs={2000}/></div>
             <p className="counter-label">Mijozlar qoniqishi</p>
           </div>
         </div>
       </section>
-
 
       <div className="cta-strip">
         <p>Siz ham hoziroq IT yechimlarimizdan foydalaning!</p>
         <p className="small">Hoziroq bizga ariza qoldiring va bepul maslahat oling.</p>
         <a href="#ariza" className="cta-btn">
           Ariza qoldirish
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M5 12h14M12 5l7 7-7 7"/>
-          </svg>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </a>
       </div>
 
       <Ariza/>
-<AI/>
-     
+      <AI/>
+
       <footer className="footer">
         <div className="footer-grid">
           <div>
             <div className="footer-brand">IT <span>Solutions</span></div>
-            <p className="footer-desc">
-              Zamonaviy IT xizmatlari va raqamli yechimlar bilan biznesingizni yangi bosqichga olib chiqamiz.
-            </p>
+            <p className="footer-desc">Zamonaviy IT xizmatlari va raqamli yechimlar bilan biznesingizni yangi bosqichga olib chiqamiz.</p>
           </div>
-
           <div>
             <p className="footer-heading">Xizmatlar</p>
             <ul className="footer-list">
@@ -498,7 +461,6 @@ export default function Home() {
               <li><a href="/#cards">IT qoʻllab-quvvatlash</a></li>
             </ul>
           </div>
-
           <div>
             <p className="footer-heading">Sahifalar</p>
             <ul className="footer-list">
@@ -508,25 +470,17 @@ export default function Home() {
               <li><a href="/contact">Aloqa</a></li>
             </ul>
           </div>
-
           <div>
             <p className="footer-heading">Aloqa</p>
             <ul className="footer-list">
               <li><a href="mailto:info@itsolutions.com">info@itsolutions.com</a></li>
-              <li>
-                <a href="tel:+998942049107">+998 94 204 91 07</a>
-              </li>
-              <li>
-                <a href="tel:+998950119953">+998 95 011 99 53</a>
-              </li>
+              <li><a href="tel:+998942049107">+998 94 204 91 07</a></li>
+              <li><a href="tel:+998950119953">+998 95 011 99 53</a></li>
               <li>Tashkent, Uzbekistan</li>
             </ul>
           </div>
         </div>
-
-        <div className="footer-bottom">
-          © {new Date().getFullYear()} IT Solutions — All rights reserved.
-        </div>
+        <div className="footer-bottom">© {new Date().getFullYear()} IT Solutions — All rights reserved.</div>
       </footer>
     </>
   );
