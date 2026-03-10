@@ -37,7 +37,7 @@ function Counter({ to, durationMs = 1500, decimals = 0, suffix = "" }: CounterPr
 
 // ─── Typewriter ───────────────────────────────────────────────────────────────
 const INFO_LINES = [
-  "  Kompaniya : IT Solutions",
+  "  Kompaniya : BlueTeam",
   "  Yo'nalish : Web Dev · Cyber Security · AI · CCTV",
   "  Manzil    : Toshkent, O'zbekiston",
   "  Tajriba   : 1.5+ yil · 20+ loyiha",
