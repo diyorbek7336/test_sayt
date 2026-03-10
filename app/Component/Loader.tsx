@@ -7,7 +7,7 @@ export default function Loader() {
   const [phase, setPhase] = useState<'loading' | 'done' | 'exit'>('loading')
 
   useEffect(() => {
-    // Progress animatsiyasi
+    
     const duration = 2200
     const interval = 30
     const steps = duration / interval
@@ -15,7 +15,7 @@ export default function Loader() {
 
     const timer = setInterval(() => {
       current++
-      // Tezlik: boshida tez, oxirida sekin (realistic)
+    
       const raw = current / steps
       const eased = raw < 0.8
         ? raw * 1.1
@@ -286,21 +286,21 @@ export default function Loader() {
       `}</style>
 
       <div className={`loader-root${phase === 'exit' ? ' exit' : ''}`}>
-        {/* Fon */}
+      
         <div className="loader-bg-glow" />
         <div className="loader-grid" />
         <div className="loader-scanner" />
 
-        {/* Burchak decorlar */}
+   
         <div className="loader-corner tl" />
         <div className="loader-corner tr" />
         <div className="loader-corner bl" />
         <div className="loader-corner br" />
 
-        {/* Markaziy kontent */}
+  
         <div className="loader-center">
 
-          {/* Shield ikonka + ring effektlar */}
+      
           <div className="loader-shield-wrap">
             <div className="loader-shield-ring" />
             <div className="loader-shield-ring" />
@@ -331,7 +331,7 @@ export default function Loader() {
           </div>
 
           <div className="loader-name">
-            Cyber<span>Qalqon</span>
+            Blue<span>Team</span>
           </div>
           <div className="loader-tagline">// Sayt ishga tushmoqda...</div>
 

@@ -18,7 +18,7 @@ export default function Header() {
               <img src="https://play-lh.googleusercontent.com/JReTwiaHtg6_p7uLNw9KrIwXrEDSSs3vAjdzLrc6_aXo7FGhik_BlFJ7ONlRLSeDTks" alt="" />
             </span>
             <span className="text-white text-lg sm:text-xl font-semibold tracking-tight">
-              CyberQalqon
+              BlueTeam
             </span>
           </Link>
 

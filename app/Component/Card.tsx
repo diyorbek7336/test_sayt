@@ -58,6 +58,12 @@ const services: Service[] = [
     icon: "https://img.icons8.com/ios-filled/100/ffffff/face-id.png",
     description: "Xodimlarning keldi-ketdisini yuz tanish texnologiyasi orqali avtomatik nazorat qilish: real-vaqt hisoboti, HR tizimi bilan integratsiya va boshqaruv paneli.",
   },
+  {
+    id: 10,
+    title: "Lokal AI Server",
+    icon: "https://img.icons8.com/ios-filled/100/ffffff/artificial-intelligence.png",
+    description: "Internet kerak bo'lmay o'z serveringizda ishlaydigan AI: ma'lumotlar tashqariga chiqmaydi, ChatGPT o'rniga maxfiy korporativ AI yechim — Ollama, LLaMA, Mistral asosida.",
+  },
 ]
 
 export default function Card() {
@@ -190,6 +196,60 @@ export default function Card() {
           pointer-events: none;
         }
 
+        /* Lokal AI card — maxsus yashil aksent */
+        .service-card.ai-card {
+          border-color: rgba(74,222,128,0.12);
+        }
+        .service-card.ai-card::before {
+          background: radial-gradient(ellipse 80% 50% at 50% 0%, rgba(74,222,128,0.07), transparent 70%);
+        }
+        .service-card.ai-card:hover {
+          border-color: rgba(74,222,128,0.28);
+          box-shadow: 0 24px 60px rgba(0,0,0,0.5), 0 0 40px rgba(74,222,128,0.08);
+        }
+        .service-card.ai-card .card-glow {
+          background: rgba(74,222,128,0.12);
+        }
+        .service-card.ai-card .card-icon-wrap {
+          background: rgba(74,222,128,0.08);
+          border-color: rgba(74,222,128,0.18);
+        }
+        .service-card.ai-card:hover .card-icon-wrap,
+        .service-card.ai-card.is-selected .card-icon-wrap {
+          border-color: rgba(74,222,128,0.4);
+          box-shadow: 0 0 18px rgba(74,222,128,0.18);
+        }
+        .service-card.ai-card .ai-badge {
+          display: inline-flex;
+        }
+        .ai-badge {
+          display: none;
+          align-items: center;
+          gap: 5px;
+          font-family: 'Space Mono', monospace;
+          font-size: 10px;
+          font-weight: 700;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          color: #4ade80;
+          background: rgba(74,222,128,0.08);
+          border: 1px solid rgba(74,222,128,0.22);
+          border-radius: 100px;
+          padding: 3px 10px;
+          margin-bottom: 0.75rem;
+        }
+        .ai-badge-dot {
+          width: 6px; height: 6px;
+          border-radius: 50%;
+          background: #4ade80;
+          box-shadow: 0 0 6px #4ade80;
+          animation: aiBlink 2s infinite;
+        }
+        @keyframes aiBlink {
+          0%,100% { opacity: 1; }
+          50% { opacity: 0.3; }
+        }
+
         .card-glow {
           position: absolute;
           top: -20px; right: -20px;
@@ -288,6 +348,23 @@ export default function Card() {
           border-color: rgba(239,68,68,0.4);
           color: #fca5a5;
           box-shadow: 0 0 20px rgba(239,68,68,0.1);
+        }
+
+        /* AI card button — yashil */
+        .ai-card .select-btn {
+          border-color: rgba(74,222,128,0.25);
+          color: #86efac;
+        }
+        .ai-card .select-btn:hover {
+          background: rgba(74,222,128,0.1);
+          border-color: rgba(74,222,128,0.5);
+          color: #dcfce7;
+          box-shadow: 0 0 20px rgba(74,222,128,0.15);
+        }
+        .ai-card .select-btn.selected {
+          background: linear-gradient(135deg, rgba(74,222,128,0.2), rgba(56,189,248,0.15));
+          border-color: rgba(74,222,128,0.5);
+          color: #bbf7d0;
         }
 
         .check-icon { flex-shrink: 0; }
@@ -539,9 +616,18 @@ export default function Card() {
           <div className="service-grid">
             {services.map((service) => {
               const selected = isSelected(service.id)
+              const isAI = service.id === 10
               return (
-                <div key={service.id} className={`service-card ${selected ? "is-selected" : ""}`}>
+                <div key={service.id} className={`service-card ${selected ? "is-selected" : ""} ${isAI ? "ai-card" : ""}`}>
                   <div className="card-glow" />
+
+                  {/* AI badge — faqat Lokal AI cardda chiqadi */}
+                  {isAI && (
+                    <div className="ai-badge">
+                      <span className="ai-badge-dot" />
+                      On-premise · Offline · Maxfiy
+                    </div>
+                  )}
 
                   <div className="card-icon-wrap">
                     <img src={service.icon} alt={service.title} />

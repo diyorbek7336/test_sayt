@@ -9,7 +9,7 @@ export default function About() {
         <div className="max-w-3xl mx-auto">
           <h1 className="text-4xl sm:text-5xl font-bold mb-8 font-mono">Biz haqimizda</h1>
           <p className="text-gray-300 text-lg leading-relaxed mb-6">
-            <strong>Server IT uz</strong> — Toshkentda professional IT xizmatlarni taqdim etuvchi jamoa.
+            <strong>BlueTeam</strong> — Toshkentda professional IT xizmatlarni taqdim etuvchi jamoa.
             Web development, tarmoq xavfsizligi, avtomatlashtirish va CCTV tizimlari bo‘yicha 1.5 yildan
             ortiq tajribaga egamiz.
           </p>
